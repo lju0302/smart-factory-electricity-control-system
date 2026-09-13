@@ -31,4 +31,4 @@ resource eventHubs 'Microsoft.EventHub/namespaces/eventhubs@2024-01-01' = [
 
 output resourceId string = namespace.id
 output name string = namespace.name
-output eventHubIds array = [for eventHub in eventHubs: eventHub.id]
+output eventHubIds array = [for i in range(length(eventHubNames)): eventHubs[i].id]

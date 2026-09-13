@@ -21,6 +21,7 @@ resource sqlServer 'Microsoft.Sql/servers@2021-11-01' = {
 resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-11-01' = {
   parent: sqlServer
   name: databaseName
+  location: location
   sku: {
     name: 'Basic'
     tier: 'Basic'

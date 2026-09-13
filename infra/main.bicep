@@ -157,13 +157,13 @@ resource eventHubNamespaceExisting 'Microsoft.EventHub/namespaces@2024-01-01' ex
 }
 
 resource eventHubReceiverRoleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
-  for app in functionAppModules: {
-    name: guid(eventHubNamespaceExisting.id, app.outputs.principalId, 'event-hubs-data-receiver')
+  for i in range(length(functionApps)): {
+    name: guid(eventHubNamespaceExisting.id, functionApps[i].name, 'event-hubs-data-receiver')
     scope: eventHubNamespaceExisting
     properties: {
-      principalId: app.outputs.principalId
+      principalId: functionAppModules[i].outputs.principalId
       principalType: 'ServicePrincipal'
-      roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '2b629674-e913-4c01-ae53-ef4638e856a1')
+      roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'a638d3c7-ab3a-418d-83e6-5f17a39d4fde')
     }
   }
 ]
@@ -183,5 +183,5 @@ module sql './modules/sql.bicep' = if (sqlServerName != '' && sqlDatabaseName !=
 output storageAccountId string = storage.outputs.resourceId
 output keyVaultUri string = keyVault.outputs.vaultUri
 output eventHubNamespaceId string = eventHubs.outputs.resourceId
-output functionAppIds array = [for app in functionAppModules: app.outputs.resourceId]
-output functionPrincipalIds array = [for app in functionAppModules: app.outputs.principalId]
+output functionAppIds array = [for i in range(length(functionApps)): functionAppModules[i].outputs.resourceId]
+output functionPrincipalIds array = [for i in range(length(functionApps)): functionAppModules[i].outputs.principalId]

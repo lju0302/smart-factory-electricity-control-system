@@ -47,7 +47,7 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
 }
 
 resource blobDataOwner 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(storageAccount.id, functionApp.identity.principalId, 'storage-blob-data-owner')
+  name: guid(storageAccount.id, appName, 'storage-blob-data-owner')
   scope: storageAccount
   properties: {
     principalId: functionApp.identity.principalId
@@ -57,7 +57,7 @@ resource blobDataOwner 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
 }
 
 resource queueDataContributor 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(storageAccount.id, functionApp.identity.principalId, 'storage-queue-data-contributor')
+  name: guid(storageAccount.id, appName, 'storage-queue-data-contributor')
   scope: storageAccount
   properties: {
     principalId: functionApp.identity.principalId
@@ -67,7 +67,7 @@ resource queueDataContributor 'Microsoft.Authorization/roleAssignments@2022-04-0
 }
 
 resource tableDataContributor 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(storageAccount.id, functionApp.identity.principalId, 'storage-table-data-contributor')
+  name: guid(storageAccount.id, appName, 'storage-table-data-contributor')
   scope: storageAccount
   properties: {
     principalId: functionApp.identity.principalId
