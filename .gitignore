@@ -1,0 +1,35 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.template
+!.env.local.template
+local.settings.json
+
+# Python and local environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+
+# Local data and databases
+*.duckdb
+*.duckdb.wal
+*.csv
+*.parquet
+__blobstorage__/
+__queuestorage__/
+__azurite_db_*.json
+
+# ML artifacts and archives
+*.joblib
+*.pkl
+*.pickle
+*.zip
+lightning_logs/
+
+# Tooling and OS noise
+.vscode/
+.DS_Store
