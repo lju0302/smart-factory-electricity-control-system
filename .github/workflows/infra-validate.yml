@@ -1,0 +1,28 @@
+name: Validate infrastructure
+
+on:
+  pull_request:
+    paths:
+      - 'infra/**'
+      - '.github/workflows/infra-validate.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'infra/**'
+      - '.github/workflows/infra-validate.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  bicep-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Bicep template
+        uses: azure/cli@v2
+        with:
+          inlineScript: az bicep build --file infra/main.bicep --outfile /tmp/smartfactory-main.json
