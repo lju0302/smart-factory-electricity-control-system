@@ -164,8 +164,8 @@ power-anomaly-alert-function/은 이상탐지 모델을 직접 실행하지 않�
     ├── power-anomaly-alert-function/
     │   ├── function_app.py
     │   └── sql/
-    ├── infra/                         # Azure IaC 예정
-    ├── .github/workflows/             # CI/CD 예정
+    ├── infra/                         # Azure Bicep IaC
+    ├── .github/workflows/             # IaC validation / what-if / dev deploy
     └── security-audit.md
 
 ## 로컬 실행
@@ -208,20 +208,38 @@ Swagger UI는 http://localhost:8000/docs에서 확인할 수 있습니다.
 
 템플릿과 제외 규칙은 각 프로젝트 디렉터리에 있습니다. 보안 점검 결과는 security-audit.md에서 확인할 수 있습니다.
 
-## IaC 방향
+## Infrastructure as Code (IaC)
 
-Azure 리소스는 infra/ 아래 Bicep 모듈로 관리할 예정입니다.
+Azure 리소스 정의는 infra/ 아래 Bicep으로 관리합니다. infra/main.bicep은 Resource Group 범위의 진입점이며, 공통 리소스와 파이프라인 역할별 Function App을 모듈로 조합합니다.
 
-- 환경별 Resource Group
-- Storage, Event Hubs, Azure SQL
-- Key Vault와 Managed Identity
-- Function App과 Application Insights
-- GitHub Actions OIDC 기반 배포
-- Pull Request의 lint, build, what-if
-- production 환경 승인 후 배포
+- infra/modules/storage.bicep: Function 런타임용 Storage Account
+- infra/modules/monitoring.bicep: Log Analytics와 Application Insights
+- infra/modules/key-vault.bicep: RBAC 기반 Key Vault
+- infra/modules/event-hubs.bicep: power-events와 anomaly-events
+- infra/modules/function-app.bicep: Python 3.11 Linux Function App, Managed Identity, Storage RBAC
+- infra/modules/sql.bicep: 선택형 Azure SQL Server와 Database
+- infra/environments/dev.bicepparam, prod.bicepparam: 환경별 리소스 이름과 입력값
 
-기존 Azure 리소스를 신규 생성할지 참조할지는 IaC 적용 단계에서 확정합니다.
+GitHub Actions는 다음 역할로 분리했습니다.
+
+- infra-validate.yml: infra 변경 시 Bicep build 검증
+- infra-what-if.yml: GitHub Environment를 선택해 Azure deployment what-if 실행
+- infra-deploy-dev.yml: main 반영 또는 수동 실행 시 dev 환경에 Incremental 배포
+
+배포 인증은 GitHub Actions OIDC를 사용하도록 작성했습니다. GitHub Environment에 AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID Secret과 AZURE_RESOURCE_GROUP Variable을 등록해야 합니다. 실제 비밀번호와 연결 문자열은 저장소에 넣지 않고 Key Vault 또는 GitHub Environment Secret으로 주입합니다.
+
+SQL 모듈은 기본 파라미터에서 비활성화되어 있습니다. SQL Server와 Database 이름을 입력해 활성화할 수 있지만 public network를 끄는 구성이라 운영 적용 전 Private Endpoint 또는 기존 SQL 네트워크 연결이 필요합니다. 실제 Azure 구독에 반영하기 전에는 반드시 what-if 결과를 검토합니다.
 
 ## 현재 GitHub 반영 상태
 
-현재 main에는 Phase 1 보안 기준, 환경 변수 템플릿, 모델 바이너리 제외 규칙이 반영되어 있습니다. 애플리케이션 소스 이관과 infra 구현은 다음 커밋 단위에서 진행합니다.
+현재 main에는 다음 항목이 반영되어 있습니다.
+
+- Phase 1 보안 기준과 security-audit.md
+- 환경 변수 템플릿과 local.settings.json, .env, joblib, DuckDB 제외 규칙
+- 프로젝트 전체 구조를 설명하는 메인 README
+- infra/ Bicep 진입점, 모듈, dev/prod 파라미터
+- IaC Bicep build 검증 workflow
+- IaC what-if workflow
+- dev 환경 Incremental 배포 workflow
+
+현재 완료된 범위는 IaC 소스와 GitHub Actions 정의를 저장소에 반영한 단계입니다. 실제 Azure subscription과 Resource Group에 대한 what-if, apply, OIDC 주체와 GitHub Environment 변수 등록, 애플리케이션 소스 배포 workflow 연결은 운영 전환 단계에서 진행해야 합니다.
