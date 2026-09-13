@@ -153,12 +153,12 @@ module functionAppModules './modules/function-app.bicep' = [
 ]
 
 resource eventHubNamespaceExisting 'Microsoft.EventHub/namespaces@2024-01-01' existing = {
-  name: eventHubs.outputs.name
+  name: eventHubNamespaceName
 }
 
 resource eventHubReceiverRoleAssignments 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
-  for i in range(length(functionApps)): {
-    name: guid(eventHubNamespaceExisting.id, functionApps[i].name, 'event-hubs-data-receiver')
+  for i in range(0, length(functionApps)): {
+    name: guid(resourceGroup().id, eventHubNamespaceName, functionApps[i].name, 'event-hubs-data-receiver')
     scope: eventHubNamespaceExisting
     properties: {
       principalId: functionAppModules[i].outputs.principalId
@@ -183,5 +183,5 @@ module sql './modules/sql.bicep' = if (sqlServerName != '' && sqlDatabaseName !=
 output storageAccountId string = storage.outputs.resourceId
 output keyVaultUri string = keyVault.outputs.vaultUri
 output eventHubNamespaceId string = eventHubs.outputs.resourceId
-output functionAppIds array = [for i in range(length(functionApps)): functionAppModules[i].outputs.resourceId]
-output functionPrincipalIds array = [for i in range(length(functionApps)): functionAppModules[i].outputs.principalId]
+output functionAppIds array = [for i in range(0, length(functionApps)): functionAppModules[i].outputs.resourceId]
+output functionPrincipalIds array = [for i in range(0, length(functionApps)): functionAppModules[i].outputs.principalId]
