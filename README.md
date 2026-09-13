@@ -224,7 +224,7 @@ GitHub Actions는 다음 역할로 분리했습니다.
 
 - infra-validate.yml: infra 변경 시 Bicep build 검증
 - infra-what-if.yml: GitHub Environment를 선택해 Azure deployment what-if 실행
-- infra-deploy-dev.yml: main 반영 또는 수동 실행 시 dev 환경에 Incremental 배포
+- infra-deploy-dev.yml: 수동 실행 시 dev 환경에 Incremental 배포
 
 배포 인증은 GitHub Actions OIDC를 사용하도록 작성했습니다. GitHub Environment에 AZURE_CLIENT_ID, AZURE_TENANT_ID, AZURE_SUBSCRIPTION_ID Secret과 AZURE_RESOURCE_GROUP Variable을 등록해야 합니다. 실제 비밀번호와 연결 문자열은 저장소에 넣지 않고 Key Vault 또는 GitHub Environment Secret으로 주입합니다.
 
