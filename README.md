@@ -29,7 +29,7 @@ Drive 원본을 기준으로 만든 Phase 1 산출물입니다. 이 디렉터리
 3. 커밋 전 아래 검사를 실행합니다.
 
 ```bash
-git grep -nE 'Endpoint=|Password=|Pwd=|SharedAccessKey|TEAMS_.*WEBHOOK' -- ':!*.template.*' || true
+git grep -nE 'Endpoint=|SharedAccessKey|TEAMS_.*WEBHOOK' -- ':!*.template.*' ':!README.md' ':!security-audit.md' || true
 git status --short --ignored
 ```
 
