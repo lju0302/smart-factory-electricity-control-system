@@ -9,6 +9,7 @@ param eventHubNamespaceName = 'eh-smartfactory-dev'
 param eventHubNames = [
   'power-events'
   'anomaly-events'
+  'aggregated-power-data'
 ]
 param sqlServerName = ''
 param sqlDatabaseName = ''

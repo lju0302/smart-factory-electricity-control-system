@@ -12,7 +12,7 @@
 
 1. DuckDB의 과거 전력 데이터를 FastAPI가 실시간 센서 이벤트처럼 재생합니다.
 2. Azure Event Hubs가 이벤트 스트림을 수신합니다.
-3. Azure Stream Analytics와 SQL 처리 계층이 1분·15분·1시간·1일 마트를 생성합니다.
+3. Azure Stream Analytics가 1분·15분 마트를 생성하고, SQL Timer Function이 Stored Procedure로 1시간·1일 마트를 생성합니다.
 4. 이상탐지 계층이 Rule/IQR와 Isolation Forest를 이용해 이상 후보를 계산합니다.
 5. 예측 계층이 NHITS와 TFT 모델로 설비별 전력 수요를 예측합니다.
 6. 리포트·알림 계층이 결과를 Microsoft Teams, 이메일, Power BI로 제공합니다.
@@ -72,8 +72,8 @@ fastapi/는 DuckDB에 저장된 전력 데이터를 읽어 실시간 이벤트�
 
 원천 이벤트는 Stream Analytics와 SQL 처리 계층을 거쳐 운영 조회용 마트로 변환됩니다.
 
-- 1분·15분 단위 전력 집계
-- Stored Procedure를 이용한 1시간·1일 집계
+- Stream Analytics를 이용한 1분·15분 단위 전력 집계
+- SQL Timer Function과 Stored Procedure를 이용한 1시간·1일 집계
 - 데이터 수집 완료 상태와 리포트 처리 상태 기록
 - 이상 예측 결과와 알림 이벤트 상태 관리
 - 로컬 개발용 DuckDB와 Azure SQL 운영 환경 분리
@@ -165,6 +165,7 @@ power-anomaly-alert-function/은 이상탐지 모델을 직접 실행하지 않�
     │   ├── function_app.py
     │   └── sql/
     ├── infra/                         # Azure Bicep IaC
+    │   └── queries/                   # Stream Analytics 1분·15분 집계 SQL
     ├── .github/workflows/             # IaC validation / what-if / dev deploy
     └── security-audit.md
 
@@ -215,7 +216,8 @@ Azure 리소스 정의는 infra/ 아래 Bicep으로 관리합니다. infra/main.
 - infra/modules/storage.bicep: Function 런타임용 Storage Account
 - infra/modules/monitoring.bicep: Log Analytics와 Application Insights
 - infra/modules/key-vault.bicep: RBAC 기반 Key Vault
-- infra/modules/event-hubs.bicep: power-events와 anomaly-events
+- infra/modules/event-hubs.bicep: power-events, anomaly-events, aggregated-power-data
+- infra/queries/stream-analytics-aggregation.sql: Stream Analytics 1분·15분 집계와 ML 입력 이벤트
 - infra/modules/function-app.bicep: Python 3.11 Linux Function App, Managed Identity, Storage RBAC
 - infra/modules/sql.bicep: 선택형 Azure SQL Server와 Database
 - infra/environments/dev.bicepparam, prod.bicepparam: 환경별 리소스 이름과 입력값
@@ -238,6 +240,8 @@ SQL 모듈은 기본 파라미터에서 비활성화되어 있습니다. SQL Ser
 - 환경 변수 템플릿과 local.settings.json, .env, joblib, DuckDB 제외 규칙
 - 프로젝트 전체 구조를 설명하는 메인 README
 - infra/ Bicep 진입점, 모듈, dev/prod 파라미터
+- Stream Analytics용 1분·15분 집계 SQL
+- SQL Timer Function이 호출하는 1시간·1일 Stored Procedure 경계
 - IaC Bicep build 검증 workflow
 - IaC what-if workflow
 - dev 환경 Incremental 배포 workflow

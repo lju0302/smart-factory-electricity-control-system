@@ -8,9 +8,10 @@
 - modules/storage.bicep: Function 런타임용 Storage Account
 - modules/monitoring.bicep: Log Analytics Workspace와 Application Insights
 - modules/key-vault.bicep: RBAC 기반 Key Vault
-- modules/event-hubs.bicep: 전력 원천 이벤트와 이상 이벤트용 Event Hubs
+- modules/event-hubs.bicep: power-events, anomaly-events, aggregated-power-data
 - modules/function-app.bicep: Python 3.11 Linux Function Apps, Managed Identity, Storage RBAC
 - modules/sql.bicep: 선택적으로 생성하는 Azure SQL Server와 Database
+- queries/stream-analytics-aggregation.sql: 1분·15분 실시간 집계와 ML 입력 이벤트
 - environments/dev.bicepparam: 개발 환경 입력
 - environments/prod.bicepparam: 운영 환경 입력
 
@@ -31,6 +32,7 @@ Function App은 다음 파이프라인 역할을 기준으로 생성됩니다.
 - SQL 모듈은 서버명과 데이터베이스명을 입력했을 때만 생성됩니다. 기본 dev/prod 파라미터는 SQL 생성을 건너뜁니다.
 - SQL 모듈을 활성화할 때 비밀번호는 명령행 또는 배포 파이프라인의 secure parameter로 전달해야 합니다.
 - SQL은 public network를 비활성화하므로, 운영 적용 전 Private Endpoint 또는 기존 SQL 네트워크 연결을 함께 결정해야 합니다.
+- Stream Analytics는 1분·15분 집계만 수행합니다. 1시간·1일 집계는 sql-timer-trigger Function App이 각각 usp_timer_aggregate_1h와 usp_timer_aggregate_1d를 호출해 처리합니다.
 
 ## 로컬 검증
 

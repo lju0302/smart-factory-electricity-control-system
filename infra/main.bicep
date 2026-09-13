@@ -19,6 +19,7 @@ param eventHubNamespaceName string
 param eventHubNames array = [
   'power-events'
   'anomaly-events'
+  'aggregated-power-data'
 ]
 @description('Optional Azure SQL logical server name. Leave blank to skip SQL creation.')
 param sqlServerName string = ''
