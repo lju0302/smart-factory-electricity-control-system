@@ -1,0 +1,24 @@
+# Local secrets and environment files
+.env
+.env.*
+!.env.template
+!.env.local.template
+local.settings.json
+
+# Python/runtime artifacts
+__pycache__/
+.venv/
+*.py[cod]
+
+# Local data and model artifacts
+*.duckdb
+*.duckdb.wal
+*.joblib
+*.pkl
+*.csv
+*.parquet
+__blobstorage__/
+__queuestorage__/
+__azurite_db_*.json
+.vscode/
+

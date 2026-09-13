@@ -1,0 +1,18 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "EventHubConnectionString": "",
+    "AnomalyEventHubName": "aggregated-power-data",
+    "AnomalyConsumerGroupName": "$default",
+    "DB_SERVER": "",
+    "DB_DATABASE": "",
+    "DB_USER": "",
+    "DB_PASSWORD": "",
+    "TEAMS_ALERT_WEBHOOK_URL": "",
+    "FUNCTIONS_WORKER_RUNTIME": "python"
+  },
+  "ConnectionStrings": {},
+  "Host": {}
+}
+

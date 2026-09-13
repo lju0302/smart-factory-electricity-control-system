@@ -1,0 +1,10 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "SQL_CONNECTION_STRING": ""
+  },
+  "ConnectionStrings": {},
+  "Host": {}
+}
+

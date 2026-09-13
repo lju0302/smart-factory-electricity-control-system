@@ -1,0 +1,15 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "SqlTriggerConnectionString": "",
+    "SqlOdbcConnectionString": "",
+    "TEAMS_WEBHOOK_URL": "",
+    "EXPECTED_EQUIPMENT_COUNT": "13",
+    "EXPECTED_EVENT_COUNT_PER_EQUIPMENT": "17280",
+    "FUNCTIONS_WORKER_RUNTIME": "python"
+  },
+  "ConnectionStrings": {},
+  "Host": {}
+}
+

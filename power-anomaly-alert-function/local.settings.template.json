@@ -1,0 +1,14 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "SqlOdbcConnectionString": "",
+    "TEAMS_ALERT_WEBHOOK_URL": "",
+    "ALERT_DISPATCH_CRON": "0 */1 * * * *",
+    "MAX_DISPATCH_COUNT": "20",
+    "MAX_RETRY_COUNT": "3"
+  },
+  "ConnectionStrings": {},
+  "Host": {}
+}
+
