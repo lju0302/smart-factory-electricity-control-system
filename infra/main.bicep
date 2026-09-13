@@ -38,7 +38,7 @@ var commonTags = union(tags, {
 })
 
 resource functionPlan 'Microsoft.Web/serverfarms@2023-12-01' = {
-  name: '\${projectName}-functions-\${environment}'
+  name: '${projectName}-functions-${environment}'
   location: location
   kind: 'functionapp'
   sku: {
@@ -52,7 +52,7 @@ resource functionPlan 'Microsoft.Web/serverfarms@2023-12-01' = {
 }
 
 module storage './modules/storage.bicep' = {
-  name: '\${projectName}-storage-\${environment}'
+  name: '${projectName}-storage-${environment}'
   params: {
     location: location
     storageAccountName: storageAccountName
@@ -61,17 +61,17 @@ module storage './modules/storage.bicep' = {
 }
 
 module monitoring './modules/monitoring.bicep' = {
-  name: '\${projectName}-monitoring-\${environment}'
+  name: '${projectName}-monitoring-${environment}'
   params: {
     location: location
-    workspaceName: '\${projectName}-logs-\${environment}'
-    appInsightsName: '\${projectName}-appi-\${environment}'
+    workspaceName: '${projectName}-logs-${environment}'
+    appInsightsName: '${projectName}-appi-${environment}'
     tags: commonTags
   }
 }
 
 module keyVault './modules/key-vault.bicep' = {
-  name: '\${projectName}-keyvault-\${environment}'
+  name: '${projectName}-keyvault-${environment}'
   params: {
     location: location
     keyVaultName: keyVaultName
@@ -80,7 +80,7 @@ module keyVault './modules/key-vault.bicep' = {
 }
 
 module eventHubs './modules/event-hubs.bicep' = {
-  name: '\${projectName}-eventhubs-\${environment}'
+  name: '${projectName}-eventhubs-${environment}'
   params: {
     location: location
     namespaceName: eventHubNamespaceName
@@ -134,10 +134,10 @@ var functionApps = [
 
 module functionAppModules './modules/function-app.bicep' = [
   for app in functionApps: {
-    name: '\${projectName}-\${app.name}-\${environment}'
+    name: '${projectName}-${app.name}-${environment}'
     params: {
       location: location
-      appName: '\${projectName}-\${app.name}-\${environment}'
+      appName: '${projectName}-${app.name}-${environment}'
       planId: functionPlan.id
       storageAccountName: storage.outputs.name
       appSettings: union(app.appSettings, [
@@ -168,7 +168,7 @@ resource eventHubReceiverRoleAssignments 'Microsoft.Authorization/roleAssignment
 ]
 
 module sql './modules/sql.bicep' = if (sqlServerName != '' && sqlDatabaseName != '') {
-  name: '\${projectName}-sql-\${environment}'
+  name: '${projectName}-sql-${environment}'
   params: {
     location: location
     serverName: sqlServerName
