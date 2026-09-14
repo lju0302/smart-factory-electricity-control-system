@@ -1,0 +1,36 @@
+INSERT INTO dbo.anomaly_event (
+    equipment_id,
+    window_end_time,
+    anomaly_type,
+    severity,
+    metric_name,
+    metric_value,
+    threshold_value,
+    anomaly_score,
+    rule_score,
+    iforest_score,
+    final_score,
+    duration_minutes,
+    detection_window,
+    status,
+    notification_status,
+    message
+)
+VALUES (
+    N'15(예비건조기)',
+    SYSDATETIME(),
+    N'LOW_POWER_FACTOR',
+    N'warning',
+    N'avg_power_factor',
+    82.4,
+    90.0,
+    0.87,
+    72.0,
+    64.0,
+    68.4,
+    30,
+    N'15m',
+    N'OPEN',
+    N'PENDING',
+    N'15분 평균 역률이 기준치보다 낮게 감지되었습니다. 지속될 경우 전력 효율 저하 및 요금 패널티 가능성이 있습니다.'
+);

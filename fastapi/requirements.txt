@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+duckdb
+pandas
+python-dotenv
+azure-eventhub
+pydantic
+requests

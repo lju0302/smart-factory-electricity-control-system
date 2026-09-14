@@ -1,0 +1,11 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+azure-functions
+pandas==2.2.2
+numpy==2.0.2
+pyarrow>=16
+sqlalchemy
+pyodbc
+torch>=2.10,<2.11
+neuralforecast==3.1.8
+pytorch-lightning>=2.5,<2.6
+python-dotenv

@@ -1,0 +1,115 @@
+---
+config:
+  flowchart:
+    defaultRenderer: elk
+  layout: fixed
+id: 98107d16-7d10-41d0-9f61-9b86312f96ae
+---
+flowchart TB
+ subgraph L1["[1] Streaming Layer"]
+        FASTAPI["FastAPI Producer<br>(시뮬레이션/송신)"]
+        EH["Azure Event Hubs<br>(실시간 수신)"]
+        EH_ANOMALY["Azure Event Hubs<br>(이상탐지용 이벤트)"]
+ end
+
+ ASA["Azure Stream Analytics"]
+
+ subgraph L2["[2] Storage & SQL Processing Layer"]
+        subgraph TABLES["주요 테이블 및 마트"]
+                T1M["1분 테이블"]
+                T15M["15분 테이블"]
+                T1H["1시간 테이블"]
+                T1D["1일 테이블"]
+                T_ANOMALY["이상탐지 테이블<br>(anomaly_prediction)"]
+                TMETA["로그 / 상태 테이블<br>(forecast/reportstatus/log)"]
+        end
+        
+        subgraph PROCS["주기적 SQL 집계"]
+                TIMER["Timer Trigger Function App"]
+                PROC["Stored Procedures<br>(usp_aggregate_1h / 1d)"]
+        end
+ end
+
+ subgraph L3["[3] ML & Automation Layer"]
+        ANOMALY["Anomaly Alert Fn<br>(Rule / Isolation Forest)"]
+        FORECAST["Forecast Fn<br>(NHITS / TFT 예측)"]
+        REPORT["Daily Report Fn<br>(HTML 리포트 생성)"]
+ end
+
+ subgraph L4["[4] Knowledge / RAG Layer"]
+        COSMOS[("Azure Cosmos DB<br>(Vector Store)")]
+        CHATBOT["RAG Chatbot<br>(Intent Router 내장)"]
+ end
+
+ subgraph L5["[5] Serving & UI Layer"]
+        PBI["Power BI Dashboard<br>(현황/이상/예측 시각화)"]
+        TEAMS["Microsoft Teams<br>(알림 / 리포트 요약)"]
+        EMAIL["Email Report<br>(일일 보고서)"]
+ end
+
+    %% 1번 레이어 및 ASA 흐름
+    FASTAPI -- EventDataBatch --> EH
+    EH --> ASA
+    
+    %% ASA에서 데이터 분배 (2번 레이어 및 이상탐지 스트림)
+    ASA -- 데이터 분배 --> T1M
+    ASA -- 데이터 분배 --> T15M
+    ASA -- 이상 데이터 라우팅 --> EH_ANOMALY
+    
+    %% 이상탐지 파이프라인 (추가 수정본)
+    EH_ANOMALY --> ANOMALY
+    ANOMALY -- 결과 적재 --> T_ANOMALY
+    ANOMALY -- 실시간 알림 발송 --> TEAMS
+    
+    %% SQL 주기적 집계 흐름
+    TIMER -- 프로시저 실행 --> PROC
+    T1M & T15M --> PROC
+    PROC --> T1H & T1D
+    PROC -- READY 상태 갱신 --> TMETA
+    
+    %% 후속 레이어 흐름
+    T15M --> FORECAST
+    TMETA -- READY 감지 --> REPORT
+    T1H & T1D --> REPORT
+    
+    %% Chatbot 및 외부 서빙 인터랙션
+    CHATBOT -- NL2SQL --> TABLES
+    CHATBOT -- Vector Search --> COSMOS
+    USER["User / Operator<br>관리자 · 현장 담당자"] -- 자연어 질의 --> CHATBOT
+    CHATBOT -- 결합 응답 --> USER
+    
+    TABLES ---> PBI
+    REPORT --> TEAMS & EMAIL
+    USER --> PBI
+    TEAMS --> USER
+    EMAIL --> USER
+    
+    %% 피드백 및 고도화 루프
+    COSMOS -. Improved context for chatbot responses .-> CHATBOT
+    CHATBOT -. User feedback / revised queries .-> FORECAST
+    CHATBOT -. Knowledge refinement feedback .-> ANOMALY
+
+     %% 스타일 정의
+     FASTAPI:::dataflow
+     EH:::dataflow
+     EH_ANOMALY:::dataflow
+     ASA:::dataflow
+     T1M:::dataflow
+     T15M:::dataflow
+     T1H:::dataflow
+     T1D:::dataflow
+     T_ANOMALY:::dataflow
+     TMETA:::dataflow
+     TIMER:::dataflow
+     PROC:::dataflow
+     ANOMALY:::feedback
+     FORECAST:::feedback
+     REPORT:::dataflow
+     COSMOS:::dataflow
+     CHATBOT:::dataflow
+     PBI:::dataflow
+     TEAMS:::dataflow
+     EMAIL:::dataflow
+     USER:::dataflow
+     classDef feedback stroke:#f87171,fill:#fff1f2
+     classDef dataflow stroke:#818cf8,fill:#eef2ff

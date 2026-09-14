@@ -1,0 +1,209 @@
+{
+  "schema_version": "1.0.0",
+  "final_anomaly_level": [
+    {
+      "level": "normal",
+      "condition": "score < 30"
+    },
+    {
+      "level": "watch",
+      "condition": "30 <= score < 50"
+    },
+    {
+      "level": "warning",
+      "condition": "50 <= score < 75"
+    },
+    {
+      "level": "critical",
+      "condition": "score >= 75"
+    }
+  ],
+  "score_weights": {
+    "1m": {
+      "rule": 0.55,
+      "iforest": 0.45,
+      "reference_only": false
+    },
+    "15m": {
+      "rule": 0.55,
+      "iforest": 0.45,
+      "reference_only": false
+    },
+    "1h": {
+      "rule": 0.55,
+      "iforest": 0.45,
+      "reference_only": false
+    },
+    "1d": {
+      "rule": 0.6,
+      "iforest": 0.4,
+      "reference_only": true
+    }
+  },
+  "model_metadata": {
+    "1m": {
+      "aggregation_level": "1m",
+      "model_path": "ml_package/models/isolation_forest_1m.joblib",
+      "scaler_path": "ml_package/models/standard_scaler_1m.joblib",
+      "feature_columns": [
+        "estimated_kW",
+        "rolling_15m_avg_kW",
+        "rolling_15m_peak_kW",
+        "carbon_emission_kg",
+        "avg_voltage_imbalance_rate",
+        "avg_current_imbalance_rate",
+        "avg_power_factor",
+        "kepco_10m_v_imb",
+        "kepco_10m_c_imb",
+        "kepco_30m_pf",
+        "event_count",
+        "completeness_ratio",
+        "hour",
+        "dayofweek",
+        "is_weekend",
+        "equipment_id_1(PM-3)",
+        "equipment_id_11(우측분전반1)",
+        "equipment_id_12(4호기)",
+        "equipment_id_13(3호기)",
+        "equipment_id_14(2호기)",
+        "equipment_id_15(예비건조기)",
+        "equipment_id_16(호이스트)",
+        "equipment_id_17(6호기)",
+        "equipment_id_18(우측분전반2)",
+        "equipment_id_2(L-1전등)",
+        "equipment_id_3(분쇄기(2))",
+        "equipment_id_4(분쇄기(1))",
+        "equipment_id_5(좌측분전반)"
+      ],
+      "score_scale": {
+        "source": "train_decision_function_percentiles",
+        "abnormal_score": "-decision_function",
+        "lower_percentile_1": -0.09218557276219132,
+        "upper_percentile_99": 4.929128242045109e-17
+      }
+    },
+    "15m": {
+      "aggregation_level": "15m",
+      "model_path": "ml_package/models/isolation_forest_15m.joblib",
+      "scaler_path": "ml_package/models/standard_scaler_15m.joblib",
+      "feature_columns": [
+        "estimated_kW",
+        "rolling_15m_avg_kW",
+        "rolling_15m_peak_kW",
+        "carbon_emission_kg",
+        "avg_voltage_imbalance_rate",
+        "avg_current_imbalance_rate",
+        "avg_power_factor",
+        "kepco_10m_v_imb",
+        "kepco_10m_c_imb",
+        "kepco_30m_pf",
+        "event_count",
+        "completeness_ratio",
+        "hour",
+        "dayofweek",
+        "is_weekend",
+        "equipment_id_1(PM-3)",
+        "equipment_id_11(우측분전반1)",
+        "equipment_id_12(4호기)",
+        "equipment_id_13(3호기)",
+        "equipment_id_14(2호기)",
+        "equipment_id_15(예비건조기)",
+        "equipment_id_16(호이스트)",
+        "equipment_id_17(6호기)",
+        "equipment_id_18(우측분전반2)",
+        "equipment_id_2(L-1전등)",
+        "equipment_id_3(분쇄기(2))",
+        "equipment_id_4(분쇄기(1))",
+        "equipment_id_5(좌측분전반)"
+      ],
+      "score_scale": {
+        "source": "train_decision_function_percentiles",
+        "abnormal_score": "-decision_function",
+        "lower_percentile_1": -0.0999250532548054,
+        "upper_percentile_99": 3.900242614971231e-18
+      }
+    },
+    "1h": {
+      "aggregation_level": "1h",
+      "model_path": "ml_package/models/isolation_forest_1h.joblib",
+      "scaler_path": "ml_package/models/standard_scaler_1h.joblib",
+      "feature_columns": [
+        "estimated_kW",
+        "rolling_15m_avg_kW",
+        "rolling_15m_peak_kW",
+        "carbon_emission_kg",
+        "avg_voltage_imbalance_rate",
+        "avg_current_imbalance_rate",
+        "avg_power_factor",
+        "kepco_10m_v_imb",
+        "kepco_10m_c_imb",
+        "kepco_30m_pf",
+        "event_count",
+        "completeness_ratio",
+        "hour",
+        "dayofweek",
+        "is_weekend",
+        "equipment_id_1(PM-3)",
+        "equipment_id_11(우측분전반1)",
+        "equipment_id_12(4호기)",
+        "equipment_id_13(3호기)",
+        "equipment_id_14(2호기)",
+        "equipment_id_15(예비건조기)",
+        "equipment_id_16(호이스트)",
+        "equipment_id_17(6호기)",
+        "equipment_id_18(우측분전반2)",
+        "equipment_id_2(L-1전등)",
+        "equipment_id_3(분쇄기(2))",
+        "equipment_id_4(분쇄기(1))",
+        "equipment_id_5(좌측분전반)"
+      ],
+      "score_scale": {
+        "source": "train_decision_function_percentiles",
+        "abnormal_score": "-decision_function",
+        "lower_percentile_1": -0.10901689184507325,
+        "upper_percentile_99": -2.825532505450895e-17
+      }
+    },
+    "1d": {
+      "aggregation_level": "1d",
+      "model_path": "ml_package/models/isolation_forest_1d.joblib",
+      "scaler_path": "ml_package/models/standard_scaler_1d.joblib",
+      "feature_columns": [
+        "estimated_kW",
+        "rolling_15m_avg_kW",
+        "rolling_15m_peak_kW",
+        "carbon_emission_kg",
+        "avg_voltage_imbalance_rate",
+        "avg_current_imbalance_rate",
+        "avg_power_factor",
+        "kepco_10m_v_imb",
+        "kepco_10m_c_imb",
+        "kepco_30m_pf",
+        "event_count",
+        "completeness_ratio",
+        "hour",
+        "dayofweek",
+        "is_weekend",
+        "equipment_id_1(PM-3)",
+        "equipment_id_11(우측분전반1)",
+        "equipment_id_12(4호기)",
+        "equipment_id_13(3호기)",
+        "equipment_id_14(2호기)",
+        "equipment_id_15(예비건조기)",
+        "equipment_id_16(호이스트)",
+        "equipment_id_17(6호기)",
+        "equipment_id_18(우측분전반2)",
+        "equipment_id_2(L-1전등)",
+        "equipment_id_3(분쇄기(2))",
+        "equipment_id_4(분쇄기(1))",
+        "equipment_id_5(좌측분전반)"
+      ],
+      "score_scale": {
+        "source": "train_decision_function_percentiles",
+        "abnormal_score": "-decision_function",
+        "lower_percentile_1": -0.13810323043914724,
+        "upper_percentile_99": -2.7159264420761886e-17
+      }
+    }
+  }
+}

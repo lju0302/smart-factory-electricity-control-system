@@ -1,0 +1,302 @@
+{
+  "schema_name": "anomaly_monitoring_output_schema",
+  "schema_version": "1.0.0",
+  "purpose": "Azure/Power BI monitoring output schema for anomaly detection inference results.",
+  "important_note_ko": "이 schema는 모델 학습용 feature schema가 아니라 추론 이후 생성되는 모니터링 output schema이다. triggered_features, threshold_values, final_reason, recommended_action 같은 설명 컬럼은 모델 학습에 사용하지 않고 IQR threshold, 실제 feature value, IsolationForest score, final score를 기반으로 생성한다.",
+  "target_storage": [
+    "Azure SQL",
+    "PostgreSQL"
+  ],
+  "final_anomaly_level_definition": [
+    {
+      "level": "normal",
+      "condition": "final_anomaly_score < 30",
+      "description_ko": "정상 범위"
+    },
+    {
+      "level": "watch",
+      "condition": "30 <= final_anomaly_score < 50",
+      "description_ko": "관찰 필요"
+    },
+    {
+      "level": "warning",
+      "condition": "50 <= final_anomaly_score < 75",
+      "description_ko": "주의/점검 후보"
+    },
+    {
+      "level": "critical",
+      "condition": "final_anomaly_score >= 75",
+      "description_ko": "우선 점검 후보"
+    }
+  ],
+  "recommended_action_rules": {
+    "avg_current_imbalance_rate_high": "전류 불균형 및 부하 편차 점검",
+    "avg_voltage_imbalance_rate_high": "전압 불평형 및 전원 품질 점검",
+    "avg_power_factor_low": "역률 저하 및 무효전력 보상 상태 점검",
+    "kepco_30m_pf_low": "누적 역률 저하 원인 점검",
+    "rolling_15m_peak_kW_high": "피크 부하 및 설비 동시 가동 여부 점검",
+    "carbon_emission_kg_high": "고부하 운전 및 에너지 사용량 점검"
+  },
+  "columns": [
+    {
+      "column_name": "equipment_id",
+      "description_ko": "설비 또는 모듈 식별자",
+      "logical_type": "string",
+      "nullable": false,
+      "db_type": "VARCHAR(100)",
+      "example_value": "module_01",
+      "category": "basic_identifier",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "window_end_time",
+      "description_ko": "이상탐지 대상 집계 구간의 종료 시각 또는 표준 이벤트 시각",
+      "logical_type": "datetime",
+      "nullable": false,
+      "db_type": "TIMESTAMP",
+      "example_value": "2025-04-18 14:35:00",
+      "category": "basic_identifier",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "aggregation_level",
+      "description_ko": "집계 단위. 1m, 15m, 1h, 1d 중 하나",
+      "logical_type": "string",
+      "nullable": false,
+      "db_type": "VARCHAR(10)",
+      "example_value": "1m",
+      "category": "basic_identifier",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "rule_anomaly",
+      "description_ko": "IQR Rule-Based 기준으로 이상 후보이면 1, 아니면 0",
+      "logical_type": "integer_boolean",
+      "nullable": false,
+      "db_type": "SMALLINT",
+      "example_value": 1,
+      "category": "rule_based_result",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "rule_score",
+      "description_ko": "IQR threshold 초과 정도를 0~100으로 환산한 Rule-Based 이상 점수",
+      "logical_type": "float",
+      "nullable": false,
+      "db_type": "DOUBLE PRECISION",
+      "example_value": 82.4,
+      "category": "rule_based_result",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "rule_reason",
+      "description_ko": "Rule-Based 이상 사유 코드. 여러 사유는 |로 연결",
+      "logical_type": "string",
+      "nullable": true,
+      "db_type": "TEXT",
+      "example_value": "avg_current_imbalance_rate_high|rolling_15m_peak_kW_high",
+      "category": "rule_based_result",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "triggered_features",
+      "description_ko": "IQR 기준을 벗어난 feature 이름 목록. 사람이 원인을 추적하기 위한 추론 후 설명 컬럼",
+      "logical_type": "json_array",
+      "nullable": true,
+      "db_type": "JSONB",
+      "example_value": "[\"avg_current_imbalance_rate\", \"rolling_15m_peak_kW\"]",
+      "category": "rule_based_result",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "triggered_feature_values",
+      "description_ko": "기준을 벗어난 feature의 실제 관측값. 실제 4월 데이터 등 운영 데이터의 feature value가 들어간다",
+      "logical_type": "json_object",
+      "nullable": true,
+      "db_type": "JSONB",
+      "example_value": "{\"avg_current_imbalance_rate\": 36.7, \"rolling_15m_peak_kW\": 18.4}",
+      "category": "rule_based_result",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "threshold_values",
+      "description_ko": "IQR 기준 lower/upper threshold. feature별로 lower, upper 값을 저장",
+      "logical_type": "json_object",
+      "nullable": true,
+      "db_type": "JSONB",
+      "example_value": "{\"avg_current_imbalance_rate\": {\"lower\": 0.2, \"upper\": 30.0}}",
+      "category": "rule_based_result",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "threshold_direction",
+      "description_ko": "threshold 판정 방향. high는 upper 초과, low는 lower 미만 기준",
+      "logical_type": "json_object",
+      "nullable": true,
+      "db_type": "JSONB",
+      "example_value": "{\"avg_current_imbalance_rate\": \"high\", \"avg_power_factor\": \"low\"}",
+      "category": "rule_based_result",
+      "power_bi_core": false
+    },
+    {
+      "column_name": "iforest_anomaly",
+      "description_ko": "IsolationForest 기준 이상 후보이면 1, 아니면 0",
+      "logical_type": "integer_boolean",
+      "nullable": false,
+      "db_type": "SMALLINT",
+      "example_value": 1,
+      "category": "isolation_forest_result",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "iforest_score",
+      "description_ko": "IsolationForest 이상도를 0~100으로 변환한 점수. 높을수록 이상에 가까움",
+      "logical_type": "float",
+      "nullable": false,
+      "db_type": "DOUBLE PRECISION",
+      "example_value": 76.1,
+      "category": "isolation_forest_result",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "iforest_score_raw",
+      "description_ko": "IsolationForest 원본 decision/score 값. 모델 디버깅 및 threshold 재검토용",
+      "logical_type": "float",
+      "nullable": true,
+      "db_type": "DOUBLE PRECISION",
+      "example_value": -0.0832,
+      "category": "isolation_forest_result",
+      "power_bi_core": false
+    },
+    {
+      "column_name": "final_anomaly_score",
+      "description_ko": "Rule-Based와 IsolationForest 점수 기여도를 조합한 최종 이상 후보 점수",
+      "logical_type": "float",
+      "nullable": false,
+      "db_type": "DOUBLE PRECISION",
+      "example_value": 79.6,
+      "category": "final_decision",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "final_anomaly_level",
+      "description_ko": "최종 이상 레벨. normal, watch, warning, critical 중 하나",
+      "logical_type": "string",
+      "nullable": false,
+      "db_type": "VARCHAR(20)",
+      "example_value": "critical",
+      "category": "final_decision",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "primary_anomaly_model",
+      "description_ko": "최종 판단에 가장 크게 기여한 모델. 예: rule_based, isolation_forest, rule_based+isolation_forest",
+      "logical_type": "string",
+      "nullable": true,
+      "db_type": "VARCHAR(100)",
+      "example_value": "rule_based+isolation_forest",
+      "category": "final_decision",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "model_vote_count",
+      "description_ko": "이상 후보로 판단한 모델 수. Rule-Based와 IsolationForest 기준 0~2",
+      "logical_type": "integer",
+      "nullable": false,
+      "db_type": "SMALLINT",
+      "example_value": 2,
+      "category": "final_decision",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "strong_anomaly_candidate",
+      "description_ko": "2개 이상 모델이 동시에 이상 후보로 판단한 강한 이상 후보 여부",
+      "logical_type": "integer_boolean",
+      "nullable": false,
+      "db_type": "SMALLINT",
+      "example_value": 1,
+      "category": "final_decision",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "critical_candidate",
+      "description_ko": "최종 점수 기준 상위 후보 또는 critical 기준에 해당하는 우선 점검 후보 여부",
+      "logical_type": "integer_boolean",
+      "nullable": false,
+      "db_type": "SMALLINT",
+      "example_value": 1,
+      "category": "final_decision",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "rule_contribution",
+      "description_ko": "최종 점수에서 Rule-Based 점수가 기여한 값. 예: rule_score * rule_weight",
+      "logical_type": "float",
+      "nullable": false,
+      "db_type": "DOUBLE PRECISION",
+      "example_value": 43.7,
+      "category": "score_contribution",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "iforest_contribution",
+      "description_ko": "최종 점수에서 IsolationForest 점수가 기여한 값. 예: iforest_score * iforest_weight",
+      "logical_type": "float",
+      "nullable": false,
+      "db_type": "DOUBLE PRECISION",
+      "example_value": 35.9,
+      "category": "score_contribution",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "final_reason",
+      "description_ko": "사람이 읽을 수 있는 한국어 설명 문장. 실제 feature 값, threshold, 모델 점수, 최종 레벨을 조합해 생성",
+      "logical_type": "string",
+      "nullable": true,
+      "db_type": "TEXT",
+      "example_value": "MCC_01 설비가 2025-04-18 14:35 기준 전류 불평형률 36.7로 IQR 상한 30.0을 초과했고 IsolationForest 점수도 76.1로 높아 critical 후보로 분류되었습니다.",
+      "category": "explanation",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "recommended_action",
+      "description_ko": "rule_reason에 기반한 권장 점검 조치",
+      "logical_type": "string",
+      "nullable": true,
+      "db_type": "TEXT",
+      "example_value": "전류 불균형 및 부하 편차 점검; 피크 부하 및 설비 동시 가동 여부 점검",
+      "category": "explanation",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "data_quality_issue_flag",
+      "description_ko": "데이터 수집 품질 이슈 여부. 설비 이상과 분리해서 해석해야 함",
+      "logical_type": "integer_boolean",
+      "nullable": false,
+      "db_type": "SMALLINT",
+      "example_value": 0,
+      "category": "data_quality",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "data_quality_reason",
+      "description_ko": "데이터 품질 이슈 사유. 예: event_count 부족, completeness_ratio 미달",
+      "logical_type": "string",
+      "nullable": true,
+      "db_type": "TEXT",
+      "example_value": "completeness_ratio_below_0.8",
+      "category": "data_quality",
+      "power_bi_core": true
+    },
+    {
+      "column_name": "created_at",
+      "description_ko": "이상탐지 결과 레코드가 생성/적재된 시각",
+      "logical_type": "datetime",
+      "nullable": false,
+      "db_type": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+      "example_value": "2026-05-21 15:10:00",
+      "category": "operation",
+      "power_bi_core": false
+    }
+  ]
+}
