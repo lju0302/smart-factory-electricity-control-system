@@ -92,10 +92,10 @@ uvicorn app.main:app --reload
 주요 엔드포인트는 다음과 같습니다.
 
 - `GET /health` — 애플리케이션 상태
-- `GET /api/stream/sample` — 샘플 이벤트 확인
-- `POST /api/stream/start` — 스트림 전송 시작
-- `POST /api/stream/stop` — 스트림 전송 중지
-- `GET /api/stream/status` — 전송 상태 확인
+- `GET /sample` — 샘플 이벤트 확인
+- `POST /stream/start` — 스트림 전송 시작
+- `POST /stream/stop` — 스트림 전송 중지
+- `GET /stream/status` — 전송 상태 확인
 
 이상 탐지는 공개 저장소에 포함하지 않은 학습 임계값 파일을 주입한 뒤 실행해야 합니다. 임계값 통계 파일의 위치와 보안 기준은 [security-audit.md](security-audit.md)를 참고하세요.
 

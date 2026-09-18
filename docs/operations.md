@@ -15,8 +15,8 @@ uvicorn app.main:app --reload
 
 ```bash
 curl http://127.0.0.1:8000/health
-curl http://127.0.0.1:8000/api/stream/sample
-curl http://127.0.0.1:8000/api/stream/status
+curl http://127.0.0.1:8000/sample
+curl http://127.0.0.1:8000/stream/status
 ```
 
 실제 Event Hubs와 SQL을 연결할 때는 `.env`와 `local.settings.json`을 저장소에 커밋하지 않습니다.
